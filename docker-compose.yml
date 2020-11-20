@@ -1,0 +1,27 @@
+version: '3'
+services:
+
+  bookings:
+    build:
+      context: ./BookingService
+      dockerfile: Dockerfile
+    environment:
+      - "CONFIG=TEST"
+    ports:
+      - "8081:8080"
+  api:
+    build:
+      context: ./ApiGateway
+      dockerfile: Dockerfile
+    depends_on:
+      - bookings
+  nginx:
+    image: nginx
+    build:
+      context : ./nginx/
+      dockerfile: nginx.dockerfile
+    depends_on:
+      - api
+    restart: always
+    ports:
+      - "80:80"
