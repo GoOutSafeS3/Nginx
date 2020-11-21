@@ -16,7 +16,7 @@ services:
       context: ./BookingService
       dockerfile: Dockerfile
     environment:
-      - "CONFIG=FAILURE_TEST"
+      - "CONFIG=TEST"
     ports:
       - "8082:8080"
 

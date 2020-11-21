@@ -19,6 +19,15 @@ services:
     ports:
       - "8081:8081"
 
+  frontend:
+    build:
+      context: ./GoOutSafe
+      dockerfile: Dockerfile
+    ports:
+      - "80:5000"
+    depends_on:
+      - api
+
   api:
     build:
       context: ./ApiGateway
@@ -36,4 +45,4 @@ services:
       - api
     restart: always
     ports:
-      - "80:80"
+      - "8080:80"
