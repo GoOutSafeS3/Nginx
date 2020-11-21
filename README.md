@@ -6,7 +6,7 @@
 
 ```
 $ docker-compose -f ./docker-compose.tests.yml build
-$ docker-compose up tests
+$ docker-compose -f ./docker-compose.tests.yml up tests
 ```
 
 ### Running the system
