@@ -8,6 +8,7 @@ services:
     depends_on:
       - bookings
       - users
+      - restaurants
     volumes:
       - ./ApiGateway/ApiGateway:/usr/src/app/ApiGateway
 
@@ -28,3 +29,42 @@ services:
       - "CONFIG=TEST"
     ports:
       - "8081:8081"
+
+  restaurants:
+    build:
+      context: ./RestaurantService
+      dockerfile: Dockerfile
+    volumes:
+      - type: volume
+        source: db-testing
+        target: /code/restaurants/db
+    depends_on:
+      - redis
+      - worker
+    ports:
+      - "8083:8080"
+    environment:
+      - "BROKER=redis://redis:6379"
+      - "BACKEND=redis://redis:6379"
+      - "CONFIG=TEST"
+  worker:
+    build:
+      context: ./RestaurantService
+    environment:
+      - "BROKER=redis://redis:6379"
+      - "BACKEND=redis://redis:6379"
+      - "CONFIG=TEST"
+    command: celery -A restaurants.worker:celery worker -l info -B -s /tmp/celerybeat-schedule
+    depends_on:
+      - redis
+    volumes:
+      - type: volume
+        source: db-testing
+        target: /code/restaurants/db
+  redis:
+    image: "redis:alpine"
+    expose:
+      - "6379"
+
+volumes:
+    db-testing:
