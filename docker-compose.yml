@@ -1,5 +1,11 @@
 version: '3'
 services:
+  notifications:
+    build:
+      context: ./NotificationService
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8080"
 
   bookings:
     build:
@@ -36,6 +42,7 @@ services:
       - bookings
       - users
       - restaurants
+      - notifications
 
   nginx:
     image: nginx

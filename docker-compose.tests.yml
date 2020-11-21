@@ -1,5 +1,11 @@
 version: '3'
 services:
+  notifications:
+    build:
+      context: ./NotificationService
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8080"
 
   tests:
     build:
@@ -9,6 +15,7 @@ services:
       - bookings
       - users
       - restaurants
+      - notifications
     volumes:
       - ./ApiGateway/ApiGateway:/usr/src/app/ApiGateway
 
