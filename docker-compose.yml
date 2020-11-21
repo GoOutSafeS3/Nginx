@@ -1,6 +1,16 @@
 version: '3'
 services:
 
+  tests:
+    build:
+      context: ./ApiGateway
+      dockerfile: Dockerfile-tests
+    depends_on:
+      - bookings
+      - users
+    volumes:
+      - ./ApiGateway/ApiGateway:/usr/src/app/ApiGateway
+
   bookings:
     build:
       context: ./BookingService
@@ -8,13 +18,25 @@ services:
     environment:
       - "CONFIG=TEST"
     ports:
-      - "8081:8080"
+      - "8082:8080"
+
+  users:
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile
+    environment:
+      - "CONFIG=TEST"
+    ports:
+      - "8081:8081"
+
   api:
     build:
       context: ./ApiGateway
       dockerfile: Dockerfile
     depends_on:
       - bookings
+      - users
+
   nginx:
     image: nginx
     build:
