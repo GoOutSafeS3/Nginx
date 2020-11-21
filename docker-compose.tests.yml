@@ -46,7 +46,7 @@ services:
     environment:
       - "BROKER=redis://redis:6379"
       - "BACKEND=redis://redis:6379"
-      - "CONFIG=TEST"
+      - "CONFIG=FAILURE_TEST"
   worker:
     build:
       context: ./RestaurantService
