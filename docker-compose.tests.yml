@@ -7,18 +7,6 @@ services:
     ports:
       - "8084:8080"
 
-  tests:
-    build:
-      context: ./ApiGateway
-      dockerfile: Dockerfile-tests
-    depends_on:
-      - bookings
-      - users
-      - restaurants
-      - notifications
-    volumes:
-      - ./ApiGateway/ApiGateway:/usr/src/app/ApiGateway
-
   bookings:
     build:
       context: ./BookingService
@@ -37,14 +25,44 @@ services:
     ports:
       - "8081:8081"
 
+  frontend:
+    build:
+      context: ./GoOutSafe
+      dockerfile: Dockerfile
+    ports:
+      - "80:5000"
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ./ApiGateway
+      dockerfile: Dockerfile
+    depends_on:
+      - bookings
+      - users
+      - restaurants
+      - notifications
+
+  nginx:
+    image: nginx
+    build:
+      context : ./nginx/
+      dockerfile: nginx.dockerfile
+    depends_on:
+      - api
+    restart: always
+    ports:
+      - "8080:80"
+
   restaurants:
     build:
       context: ./RestaurantService
       dockerfile: Dockerfile
     volumes:
       - type: volume
-        source: db-testing
-        target: /usr/src/app/restaurants/db
+        source: db-production
+        target: /code/monolith/db
     depends_on:
       - redis
       - worker
@@ -60,18 +78,17 @@ services:
     environment:
       - "BROKER=redis://redis:6379"
       - "BACKEND=redis://redis:6379"
-      - "CONFIG=TEST"
-    command: celery -A restaurants.worker:celery worker -l info -B -s /tmp/celerybeat-schedule
+      - "CONFIG=PRODUCTION"
+    command: celery -A monolith.worker:celery worker -l info -B -s /tmp/celerybeat-schedule
     depends_on:
       - redis
     volumes:
       - type: volume
-        source: db-testing
-        target: /usr/src/app/restaurants/db
+        source: db-production
+        target: /code/monolith/db
   redis:
     image: "redis:alpine"
     expose:
       - "6379"
-
 volumes:
-    db-testing:
+  db-production:
