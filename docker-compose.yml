@@ -61,8 +61,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - type: volume
-        source: db-production
-        target: /code/monolith/db
+        source: db-testing
+        target: /usr/src/app/restaurants/db
     depends_on:
       - redis
       - worker
@@ -71,24 +71,25 @@ services:
     environment:
       - "BROKER=redis://redis:6379"
       - "BACKEND=redis://redis:6379"
-      - "CONFIG=PROD"
+      - "CONFIG=DOCKER"
   worker:
     build:
       context: ./RestaurantService
     environment:
       - "BROKER=redis://redis:6379"
       - "BACKEND=redis://redis:6379"
-      - "CONFIG=PRODUCTION"
-    command: celery -A monolith.worker:celery worker -l info -B -s /tmp/celerybeat-schedule
+      - "CONFIG=DOCKER"
+    command: celery -A restaurants.worker:celery worker -l info -B -s /tmp/celerybeat-schedule
     depends_on:
       - redis
     volumes:
       - type: volume
-        source: db-production
-        target: /code/monolith/db
+        source: db-testing
+        target: /usr/src/app/restaurants/db
   redis:
     image: "redis:alpine"
     expose:
       - "6379"
+
 volumes:
-  db-production:
+    db-testing:
