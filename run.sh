@@ -9,6 +9,10 @@ case "$1" in
         cd ./RestaurantService
         ./run.sh unittests
         cd ..
+
+        cd ./NotificationService
+        ./run.sh unittests
+        cd ..
         ;;
     "integration-tests")
         docker-compose -f ./docker-compose.integrationtests.yml build
