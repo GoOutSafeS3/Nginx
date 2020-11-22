@@ -16,15 +16,6 @@ services:
     ports:
       - "8082:8080"
 
-  users:
-    build:
-      context: ./UserService
-      dockerfile: Dockerfile
-    environment:
-      - "CONFIG=TEST"
-    ports:
-      - "8081:8081"
-
   frontend:
     build:
       context: ./GoOutSafe
@@ -54,6 +45,42 @@ services:
     restart: always
     ports:
       - "8080:80"
+
+  users:
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile
+    volumes:
+      - type: volume
+        source: db-testing-users
+        target: /usr/src/app/users/db
+    depends_on:
+      - redis-users
+      - worker-users
+    ports:
+      - "8081:8081"
+    environment:
+      - "BROKER=redis://redis-users:6379"
+      - "BACKEND=redis://redis-users:6379"
+      - "CONFIG=FAILURE_TEST"
+  worker-users:
+    build:
+      context: ./UserService
+    environment:
+      - "BROKER=redis://redis-users:6379"
+      - "BACKEND=redis://redis-users:6379"
+      - "CONFIG=FAILURE_TEST"
+    command: celery -A users.worker:celery worker -l info -B -s /tmp/celerybeat-schedule
+    depends_on:
+      - redis-users
+    volumes:
+      - type: volume
+        source: db-testing-users
+        target: /usr/src/app/users/db
+  redis-users:
+    image: "redis:alpine"
+    expose:
+      - "6379"
 
   restaurants:
     build:
@@ -93,3 +120,4 @@ services:
 
 volumes:
     db-testing:
+    db-testing-users:
