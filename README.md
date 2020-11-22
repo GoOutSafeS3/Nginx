@@ -5,15 +5,30 @@
 ### Unit tests
 
 ```
-$ docker-compose -f ./docker-compose.tests.yml build
-$ docker-compose -f ./docker-compose.tests.yml up tests
-$ docker-compose -f ./docker-compose.tests.yml down
+$ ./run.sh unittests
 ```
 
-### Running the system
+### Integration tests
 
 ```
-$ docker-compose build
-$ docker-compose up --scale api=3
+$ ./run.sh integration-tests
+```
+
+### Frontend tests
+
+```
+$ ./run.sh frontend-tests
+```
+
+### Deploy with fake data
+
+```
+$ ./run.sh deploy-test
+```
+
+### Deploy in production
+
+```
+$ ./run.sh deploy-prod
 ```
 
