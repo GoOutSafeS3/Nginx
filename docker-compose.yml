@@ -47,7 +47,7 @@ services:
   nginx:
     image: nginx
     build:
-      context : ./nginx/
+      context : ./Nginx/
       dockerfile: nginx.dockerfile
     depends_on:
       - api
