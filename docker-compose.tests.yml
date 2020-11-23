@@ -62,14 +62,14 @@ services:
     environment:
       - "BROKER=redis://redis-users:6379"
       - "BACKEND=redis://redis-users:6379"
-      - "CONFIG=FAILURE_TEST"
+      - "CONFIG=TEST"
   worker-users:
     build:
       context: ./UserService
     environment:
       - "BROKER=redis://redis-users:6379"
       - "BACKEND=redis://redis-users:6379"
-      - "CONFIG=FAILURE_TEST"
+      - "CONFIG=TEST"
     command: celery -A users.worker:celery worker -l info -B -s /tmp/celerybeat-schedule
     depends_on:
       - redis-users
