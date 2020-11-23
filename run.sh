@@ -10,6 +10,10 @@ case "$1" in
         ./run.sh unittests
         cd ..
 
+        cd ./UserService
+        ./run.sh unittests
+        cd ..
+
         cd ./NotificationService
         ./run.sh unittests
         cd ..
