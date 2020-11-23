@@ -35,8 +35,6 @@ $ ./run.sh deploy-prod
 ## Troubleshooting
 In case of error, try to manually stop the containers:
 ```
-$ ./run.sh deploy-prod
-```
 $ docker-compose down
 $ docker-compose -f ./docker-compose.integrationtests.yml down
 $ docker-compose -f ./docker-compose.tests.yml down
