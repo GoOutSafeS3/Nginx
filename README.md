@@ -1,5 +1,7 @@
 # GoOutSafe - ApiGateway
 
+To connect just type: http://localhost or http://localhost:80/
+
 ## Running the code
 
 ### Unit tests
