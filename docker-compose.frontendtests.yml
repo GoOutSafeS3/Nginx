@@ -1,0 +1,125 @@
+version: '3'
+services:
+  notifications:
+    build:
+      context: ./NotificationService
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8080"
+
+  bookings:
+    build:
+      context: ./BookingService
+      dockerfile: Dockerfile
+    environment:
+      - "CONFIG=FAILURE_TEST"
+    ports:
+      - "8082:8080"
+
+  frontend:
+    build:
+      context: ./GoOutSafe
+      dockerfile: Dockerfile
+    ports:
+      - "80:5000"
+    depends_on:
+      - nginx
+    command:
+      - pytest --cov=monolith --cov-report term-missing
+
+  api:
+    build:
+      context: ./ApiGateway
+      dockerfile: Dockerfile
+    depends_on:
+      - bookings
+      - users
+      - restaurants
+      - notifications
+
+  nginx:
+    image: nginx
+    build:
+      context : ./Nginx/
+      dockerfile: nginx.dockerfile
+    depends_on:
+      - api
+    restart: always
+    ports:
+      - "8080:80"
+
+  users:
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile
+    volumes:
+      - type: volume
+        source: db-testing-users
+        target: /usr/src/app/users/db
+    depends_on:
+      - redis-users
+      - worker-users
+    ports:
+      - "8081:8081"
+    environment:
+      - "BROKER=redis://redis-users:6379"
+      - "BACKEND=redis://redis-users:6379"
+      - "CONFIG=TEST"
+  worker-users:
+    build:
+      context: ./UserService
+    environment:
+      - "BROKER=redis://redis-users:6379"
+      - "BACKEND=redis://redis-users:6379"
+      - "CONFIG=TEST"
+    command: celery -A users.worker:celery worker -l info -B -s /tmp/celerybeat-schedule
+    depends_on:
+      - redis-users
+    volumes:
+      - type: volume
+        source: db-testing-users
+        target: /usr/src/app/users/db
+  redis-users:
+    image: "redis:alpine"
+    expose:
+      - "6379"
+
+  restaurants:
+    build:
+      context: ./RestaurantService
+      dockerfile: Dockerfile
+    volumes:
+      - type: volume
+        source: db-testing
+        target: /usr/src/app/restaurants/db
+    depends_on:
+      - redis
+      - worker
+    ports:
+      - "8083:8080"
+    environment:
+      - "BROKER=redis://redis:6379"
+      - "BACKEND=redis://redis:6379"
+      - "CONFIG=FAILURE_TEST"
+  worker:
+    build:
+      context: ./RestaurantService
+    environment:
+      - "BROKER=redis://redis:6379"
+      - "BACKEND=redis://redis:6379"
+      - "CONFIG=FAILURE_TEST"
+    command: celery -A restaurants.worker:celery worker -l info -B -s /tmp/celerybeat-schedule
+    depends_on:
+      - redis
+    volumes:
+      - type: volume
+        source: db-testing
+        target: /usr/src/app/restaurants/db
+  redis:
+    image: "redis:alpine"
+    expose:
+      - "6379"
+
+volumes:
+    db-testing:
+    db-testing-users:
