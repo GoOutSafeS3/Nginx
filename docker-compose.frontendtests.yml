@@ -24,8 +24,7 @@ services:
       - "80:5000"
     depends_on:
       - nginx
-    command:
-      - pytest --cov=monolith --cov-report term-missing
+    command: pytest --cov=monolith --cov-report term-missing
 
   api:
     build:
