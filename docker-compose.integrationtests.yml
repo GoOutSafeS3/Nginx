@@ -10,7 +10,7 @@ services:
   tests:
     build:
       context: ./ApiGateway
-      dockerfile: Dockerfile-tests
+      dockerfile: Dockerfile
     depends_on:
       - bookings
       - users
@@ -18,6 +18,8 @@ services:
       - notifications
     volumes:
       - ./ApiGateway/ApiGateway:/usr/src/app/ApiGateway
+    command:
+      - pytest --cov=ApiGateway --cov-report term-missing
 
   bookings:
     build:
