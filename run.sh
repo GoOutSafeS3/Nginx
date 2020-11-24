@@ -25,7 +25,7 @@ case "$1" in
         ;;
     "frontend-tests")
         docker-compose -f ./docker-compose.frontendtests.yml build
-        docker-compose -f ./docker-compose.frontendtests.yml up
+        docker-compose -f ./docker-compose.frontendtests.yml up --scale api=3 frontend
         docker-compose -f ./docker-compose.frontendtests.yml down
         ;;
     "deploy-prod")
