@@ -18,8 +18,7 @@ services:
       - notifications
     volumes:
       - ./ApiGateway/ApiGateway:/usr/src/app/ApiGateway
-    command:
-      - pytest --cov=ApiGateway --cov-report term-missing
+    command: pytest --cov=ApiGateway --cov-report term-missing
 
   bookings:
     build:
